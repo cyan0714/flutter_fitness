@@ -1,6 +1,6 @@
 # Flutter_Fitness
 
-## 一款简单的适配 ios 和 Android 的健身记录 app, 适合学习 Flutter
+一款简单的适配 ios 和 Android 的健身记录 app, 适合学习 Flutter
 
 ## Screenshot
 
