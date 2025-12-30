@@ -152,7 +152,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       final record = _records[index];
                       return Card(
                         margin: const EdgeInsets.only(bottom: 12),
-                        elevation: 2,
+                        elevation: 2, // 设置阴影的高度为2，使Card有轻微的浮起效果
                         child: ListTile(
                           contentPadding: const EdgeInsets.symmetric(
                             horizontal: 16,

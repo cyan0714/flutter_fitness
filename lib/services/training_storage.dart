@@ -26,10 +26,15 @@ class TrainingStorage {
 
     try {
       final jsonList = jsonDecode(jsonString) as List;
+      // 将 jsonList（解码后的 List）中的每个元素 json 转成 TrainingRecord 对象
+      // TrainingRecord.fromJson 接收 Map<String, dynamic>，所以这里要用 as 做类型断言
+      // .toList() 把 map 迭代的结果收集成一个 List<TrainingRecord>
+      // ..sort(...) 是 Dart 的级联运算符，用于在已生成的 List<TrainingRecord> 上直接排序（原地排序，不返回新 List），
+      // 这里以 dateTime 字段做降序排列（时间最新的排前面）
       return jsonList
           .map((json) => TrainingRecord.fromJson(json as Map<String, dynamic>))
           .toList()
-        ..sort((a, b) => b.dateTime.compareTo(a.dateTime)); // 按时间倒序排列
+          ..sort((a, b) => b.dateTime.compareTo(a.dateTime)); // 按时间倒序排列
     } catch (e) {
       return [];
     }

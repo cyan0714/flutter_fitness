@@ -1,7 +1,34 @@
 import 'package:flutter/material.dart';
+import '../widgets/equipment_card.dart';
 
-class ChestPage extends StatelessWidget {
+class ChestPage extends StatefulWidget {
   const ChestPage({super.key});
+
+  @override
+  State<ChestPage> createState() => _ChestPageState();
+}
+
+class _ChestPageState extends State<ChestPage> {
+  // 器械列表
+  final List<Map<String, String>> _equipmentList = const [
+    {'name': 'Barbell Bench Press', 'chinese': '杠铃卧推'},
+    {'name': 'Dumbbell Bench Press', 'chinese': '哑铃卧推'},
+    {'name': 'Chest Press Machine', 'chinese': '推胸训练器'},
+    {'name': 'Pec Deck Fly', 'chinese': '蝴蝶机夹胸'},
+  ];
+
+  // 图片列表（按器械顺序对应）
+  final List<String> _imageList = const [
+    'assets/images/chest/杠铃卧推.png',
+    'assets/images/chest/哑铃卧推.jpg',
+    'assets/images/chest/推胸训练器.jpg',
+    'assets/images/chest/蝴蝶机夹胸.jpg',
+  ];
+
+  // 获取图片（根据索引获取对应图片）
+  String _getImage(int index) {
+    return _imageList[index];
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -10,10 +37,25 @@ class ChestPage extends StatelessWidget {
         title: const Text('胸部训练'),
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
       ),
-      body: const Center(
-        child: Text(
-          '胸部训练',
-          style: TextStyle(fontSize: 24),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: GridView.builder(
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2, // 每行2个
+            crossAxisSpacing: 16.0, // 水平间距
+            mainAxisSpacing: 16.0, // 垂直间距
+            childAspectRatio: 1.0, // 正方形
+          ),
+          itemCount: _equipmentList.length,
+          itemBuilder: (context, index) {
+            final equipment = _equipmentList[index];
+            final imagePath = _getImage(index);
+
+            return EquipmentCard(
+              equipment: equipment,
+              imagePath: imagePath,
+            );
+          },
         ),
       ),
     );
