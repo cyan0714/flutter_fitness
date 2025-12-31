@@ -11,4 +11,9 @@
     <img src="./screenshot/mobile2.png" width="270" height="540" />
 </div>
 
+扫描二维码即可下载 app
+
+<div>
+    <img src="./screenshot/qRCode.png"/>
+</div>
 
