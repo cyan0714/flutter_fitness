@@ -14,6 +14,6 @@
 扫描二维码即可下载 app
 
 <div>
-    <img src="./screenshot/QRCode.png"/>
+    <img src="./screenshot/qRCode-v2.png"/>
 </div>
 
