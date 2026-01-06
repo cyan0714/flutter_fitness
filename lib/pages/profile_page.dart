@@ -245,7 +245,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                   return ListTile(
                                     contentPadding: const EdgeInsets.symmetric(
                                       horizontal: 16,
-                                      vertical: 8,
+                                      vertical: 0,
                                     ),
                                     leading: CircleAvatar(
                                       backgroundColor: Theme.of(context)
@@ -268,14 +268,14 @@ class _ProfilePageState extends State<ProfilePage> {
                                     subtitle: Column(
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
-                                        const SizedBox(height: 4),
-                                        Text(
-                                          record.equipmentName,
-                                          style: TextStyle(
-                                            fontSize: 12,
-                                            color: Colors.grey[600],
-                                          ),
-                                        ),
+                                        // const SizedBox(height: 4),
+                                        // Text(
+                                        //   record.equipmentName,
+                                        //   style: TextStyle(
+                                        //     fontSize: 12,
+                                        //     color: Colors.grey[600],
+                                        //   ),
+                                        // ),
                                         const SizedBox(height: 4),
                                         Text(
                                           '${record.sets}组 × ${record.reps}次 × ${record.weight}${record.unit}',
@@ -284,14 +284,14 @@ class _ProfilePageState extends State<ProfilePage> {
                                             fontWeight: FontWeight.w500,
                                           ),
                                         ),
-                                        const SizedBox(height: 4),
-                                        Text(
-                                          '${record.dateTime.hour.toString().padLeft(2, '0')}:${record.dateTime.minute.toString().padLeft(2, '0')}',
-                                          style: TextStyle(
-                                            fontSize: 12,
-                                            color: Colors.grey[500],
-                                          ),
-                                        ),
+                                        // const SizedBox(height: 4),
+                                        // Text(
+                                        //   '${record.dateTime.hour.toString().padLeft(2, '0')}:${record.dateTime.minute.toString().padLeft(2, '0')}',
+                                        //   style: TextStyle(
+                                        //     fontSize: 12,
+                                        //     color: Colors.grey[500],
+                                        //   ),
+                                        // ),
                                       ],
                                     ),
                                     trailing: IconButton(
