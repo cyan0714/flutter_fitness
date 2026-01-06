@@ -4,7 +4,10 @@ import '../services/training_storage.dart';
 
 class TrainingDialogHelper {
   // 显示训练输入对话框
-  static void showTrainingDialog(BuildContext context, Map<String, String> equipment) {
+  static void showTrainingDialog(
+    BuildContext context,
+    Map<String, String> equipment,
+  ) {
     final TextEditingController setsController = TextEditingController();
     final TextEditingController repsController = TextEditingController();
     final TextEditingController weightController = TextEditingController();
@@ -106,7 +109,10 @@ class TrainingDialogHelper {
                               border: OutlineInputBorder(),
                               prefixIcon: Icon(Icons.fitness_center),
                             ),
-                            keyboardType: TextInputType.number,
+                            keyboardType: const TextInputType.numberWithOptions(
+                              decimal: true,
+                              signed: false,
+                            ),
                             onChanged: (_) {
                               if (errorMessage != null) {
                                 setState(() {
@@ -198,25 +204,27 @@ class TrainingDialogHelper {
                       dateTime: DateTime.now(),
                     );
 
-                    TrainingStorage.saveRecord(record).then((_) {
-                      Navigator.of(context).pop();
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(
-                            '已记录：${equipment['chinese']} - $sets组 × $reps次 × ${weight}${selectedUnit}',
-                          ),
-                          duration: const Duration(seconds: 2),
-                        ),
-                      );
-                    }).catchError((error) {
-                      Navigator.of(context).pop();
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('保存失败：$error'),
-                          duration: const Duration(seconds: 2),
-                        ),
-                      );
-                    });
+                    TrainingStorage.saveRecord(record)
+                        .then((_) {
+                          Navigator.of(context).pop();
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                '已记录：${equipment['chinese']} - $sets组 × $reps次 × ${weight}${selectedUnit}',
+                              ),
+                              duration: const Duration(seconds: 2),
+                            ),
+                          );
+                        })
+                        .catchError((error) {
+                          Navigator.of(context).pop();
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('保存失败：$error'),
+                              duration: const Duration(seconds: 2),
+                            ),
+                          );
+                        });
                   },
                   child: const Text('确认'),
                 ),
@@ -228,4 +236,3 @@ class TrainingDialogHelper {
     );
   }
 }
-
