@@ -31,18 +31,45 @@ class _ProfilePageState extends State<ProfilePage> {
     });
   }
 
-  // 格式化日期时间
-  String _formatDateTime(DateTime dateTime) {
+  // 按日期分组记录
+  Map<String, List<TrainingRecord>> _groupRecordsByDate() {
+    final Map<String, List<TrainingRecord>> grouped = {};
+    
+    // 按日期时间倒序排序（最新的在前）
+    final sortedRecords = List<TrainingRecord>.from(_records)
+      ..sort((a, b) => b.dateTime.compareTo(a.dateTime));
+    
+    for (final record in sortedRecords) {
+      final dateKey = _getDateKey(record.dateTime);
+      grouped.putIfAbsent(dateKey, () => []).add(record);
+    }
+    
+    return grouped;
+  }
+
+  // 获取日期键（用于分组）
+  String _getDateKey(DateTime dateTime) {
+    return '${dateTime.year}-${dateTime.month.toString().padLeft(2, '0')}-${dateTime.day.toString().padLeft(2, '0')}';
+  }
+
+  // 格式化日期标题
+  String _formatDateTitle(String dateKey) {
+    final parts = dateKey.split('-');
+    final year = int.parse(parts[0]);
+    final month = int.parse(parts[1]);
+    final day = int.parse(parts[2]);
+    final date = DateTime(year, month, day);
+    
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
-    final recordDate = DateTime(dateTime.year, dateTime.month, dateTime.day);
-
-    if (recordDate == today) {
-      return '今天 ${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}';
-    } else if (recordDate == today.subtract(const Duration(days: 1))) {
-      return '昨天 ${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}';
+    final yesterday = today.subtract(const Duration(days: 1));
+    
+    if (date == today) {
+      return '今天';
+    } else if (date == yesterday) {
+      return '昨天';
     } else {
-      return '${dateTime.year}-${dateTime.month.toString().padLeft(2, '0')}-${dateTime.day.toString().padLeft(2, '0')} ${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}';
+      return '$year年$month月$day日';
     }
   }
 
@@ -145,70 +172,140 @@ class _ProfilePageState extends State<ProfilePage> {
                 )
               : RefreshIndicator(
                   onRefresh: _loadRecords,
-                  child: ListView.builder(
-                    padding: const EdgeInsets.all(16),
-                    itemCount: _records.length,
-                    itemBuilder: (context, index) {
-                      final record = _records[index];
-                      return Card(
-                        margin: const EdgeInsets.only(bottom: 12),
-                        elevation: 2, // 设置阴影的高度为2，使Card有轻微的浮起效果
-                        child: ListTile(
-                          contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 8,
-                          ),
-                          leading: CircleAvatar(
-                            backgroundColor:
-                                Theme.of(context).colorScheme.primaryContainer,
-                            child: Icon(
-                              Icons.fitness_center,
-                              color: Theme.of(context).colorScheme.onPrimaryContainer,
+                  child: Builder(
+                    builder: (context) {
+                      final groupedRecords = _groupRecordsByDate();
+                      final dateKeys = groupedRecords.keys.toList();
+                      
+                      return ListView.builder(
+                        padding: const EdgeInsets.all(16),
+                        itemCount: dateKeys.length,
+                        itemBuilder: (context, index) {
+                          final dateKey = dateKeys[index];
+                          final records = groupedRecords[dateKey]!;
+                          
+                          return Card(
+                            margin: const EdgeInsets.only(bottom: 16),
+                            elevation: 2,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                // 日期标题
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 16,
+                                    vertical: 12,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .primaryContainer
+                                        .withOpacity(0.3),
+                                    borderRadius: const BorderRadius.only(
+                                      topLeft: Radius.circular(4),
+                                      topRight: Radius.circular(4),
+                                    ),
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      Icon(
+                                        Icons.calendar_today,
+                                        size: 18,
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onPrimaryContainer,
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Text(
+                                        _formatDateTitle(dateKey),
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 16,
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onPrimaryContainer,
+                                        ),
+                                      ),
+                                      const Spacer(),
+                                      Text(
+                                        '${records.length}项训练',
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onPrimaryContainer
+                                              .withOpacity(0.7),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                // 该日期的训练记录列表
+                                ...records.map((record) {
+                                  return ListTile(
+                                    contentPadding: const EdgeInsets.symmetric(
+                                      horizontal: 16,
+                                      vertical: 8,
+                                    ),
+                                    leading: CircleAvatar(
+                                      backgroundColor: Theme.of(context)
+                                          .colorScheme
+                                          .primaryContainer,
+                                      child: Icon(
+                                        Icons.fitness_center,
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onPrimaryContainer,
+                                      ),
+                                    ),
+                                    title: Text(
+                                      record.equipmentChinese,
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 16,
+                                      ),
+                                    ),
+                                    subtitle: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        const SizedBox(height: 4),
+                                        Text(
+                                          record.equipmentName,
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            color: Colors.grey[600],
+                                          ),
+                                        ),
+                                        const SizedBox(height: 4),
+                                        Text(
+                                          '${record.sets}组 × ${record.reps}次 × ${record.weight}${record.unit}',
+                                          style: const TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 4),
+                                        Text(
+                                          '${record.dateTime.hour.toString().padLeft(2, '0')}:${record.dateTime.minute.toString().padLeft(2, '0')}',
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            color: Colors.grey[500],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    trailing: IconButton(
+                                      icon: const Icon(Icons.delete_outline),
+                                      color: Colors.red[300],
+                                      onPressed: () => _deleteRecord(record.id),
+                                      tooltip: '删除',
+                                    ),
+                                  );
+                                }).toList(),
+                              ],
                             ),
-                          ),
-                          title: Text(
-                            record.equipmentChinese,
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
-                            ),
-                          ),
-                          subtitle: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const SizedBox(height: 4),
-                              Text(
-                                record.equipmentName,
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: Colors.grey[600],
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              Text(
-                                '${record.sets}组 × ${record.reps}次 × ${record.weight}${record.unit}',
-                                style: const TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              Text(
-                                _formatDateTime(record.dateTime),
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: Colors.grey[500],
-                                ),
-                              ),
-                            ],
-                          ),
-                          trailing: IconButton(
-                            icon: const Icon(Icons.delete_outline),
-                            color: Colors.red[300],
-                            onPressed: () => _deleteRecord(record.id),
-                            tooltip: '删除',
-                          ),
-                        ),
+                          );
+                        },
                       );
                     },
                   ),
